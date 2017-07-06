@@ -1,0 +1,43 @@
+VAGRANTFILE_API_VERSION = '2'
+
+$run_portainer = <<EOF
+docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer --no-auth
+# Other portainer options
+# docker run -d -p 9000:9000 portainer/portainer -H tcp://<REMOTE_HOST>:<REMOTE_PORT>
+# docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
+# For SELinux
+# docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
+EOF
+
+# docker run --name mariadb -e MYSQL_ROOT_PASSWORD=letmein -d mariadb
+# sleep to allow mariadb to initialise
+$install_wordpress = <<EOF
+sleep 20
+docker run --name wordpress --link mariadb:mysql -d -p 9001:80 wordpress
+EOF
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = 'ubuntu/trusty64'
+  
+  config.vm.define 'portainer_wordpress' do |v|
+    v.vm.provider 'virtualbox' do |vb|
+      vb.customize ['setextradata', 'global', 'GUI/SuppressMessages', 'all' ]
+      vb.customize ['modifyvm', :id, '--ioapic', 'on']
+      vb.cpus = 1
+      vb.memory = 1024
+      vb.linked_clone = true
+    end
+    v.vm.hostname = 'portainer'
+    v.vm.network 'private_network', ip: '172.20.20.10'
+    v.vm.network 'forwarded_port', id: 'portainer', host_ip: '127.0.0.1', host: 9000, guest: 9000, protocol: 'tcp'
+    v.vm.network 'forwarded_port', id: 'wordpress', host_ip: '127.0.0.1', host: 9001, guest: 9001, protocol: 'tcp'
+    v.vm.provision 'docker' do |docker|
+      docker.pull_images 'portainer/portainer'
+      docker.run 'mariadb', 
+        args: '--name mariadb -e MYSQL_ROOT_PASSWORD=letmein', 
+        daemonize: true
+    end
+    v.vm.provision 'shell', inline: $run_portainer
+    v.vm.provision 'shell', inline: $install_wordpress
+  end
+end

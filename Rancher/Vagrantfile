@@ -1,0 +1,40 @@
+VAGRANTFILE_API_VERSION = '2'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = 'ubuntu/trusty64'
+  
+  hostname_server = 'rancher-server'
+  server_ip = "172.19.8.100"
+  config.vm.define hostname_server do |v|
+    v.vm.provider 'virtualbox' do |vb|
+      vb.customize ['setextradata', 'global', 'GUI/SuppressMessages', 'all' ]
+      vb.customize ['modifyvm', :id, '--ioapic', 'on']
+      vb.cpus = 1
+      vb.memory = 1024
+    end
+    v.vm.hostname = 'rancher-server'
+    v.vm.network 'forwarded_port', host: 9000, guest: 9000, auto_correct: true
+    v.vm.network 'private_network', ip: server_ip
+    v.vm.provision 'docker' do |docker|
+      docker.run 'rancher/server:stable', 
+        auto_assign_name: false,
+        args: '--name=rancher --restart=unless-stopped -p 9000:8080', 
+        daemonize: true
+    end
+  end
+
+  hostname_node = 'rancher-agent-1'
+  node_ip = "172.19.8.101"
+  config.vm.define hostname_node do |v|
+    v.vm.provider 'virtualbox' do |vb|
+      vb.customize ['setextradata', 'global', 'GUI/SuppressMessages', 'all' ]
+      vb.customize ['modifyvm', :id, '--ioapic', 'on']
+      vb.cpus = 1
+      vb.memory = 1024
+    end
+    v.vm.hostname = hostname_node
+    v.vm.network 'private_network', ip: node_ip
+    v.vm.network 'forwarded_port', id: 'jenkins', host_ip: '127.0.0.1', host: 8080, guest: 8080, auto_correct: true    
+    v.vm.provision 'shell', inline: 'curl https://releases.rancher.com/install-docker/17.03.sh | sh'
+  end
+end
