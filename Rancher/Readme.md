@@ -113,3 +113,5 @@ Rancher server is working in the latest version of Docker (17.06)
 Rancher agent needs a Docker version earlier than 17.04
 * http://rancher.com/docs/rancher/v1.6/en/hosts/#supported-docker-versions
 * https://github.com/rancher/rancher/issues/9192
+
+Lots of community images available, Wordpress? Drupal? No problem. Simple to run an install, if using this VM and demo then you MAY need to create extra port mappings if you want to access the services on your host machine as localhost, for example, Jenkins and/or Wordpress can be made available in the host browser as http://localhost:8000 or http://localhost:80
