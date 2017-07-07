@@ -76,13 +76,29 @@ The Vagrant file contains definitions for two virtual machines, a Rancher server
     Permission you need to have (but didn't): hudson.model.Hudson.Administer
     -->
     ```
-    NB: It may take some time to provision Jenkins depending on your download speed, the processing power of your host and the settings on the VM
+    NB: It may take some time to provision Jenkins depending on your download speed, the processing power of your host and the settings on the VM. My setup which is an i7 Quad Core laptop takes around 20 minutes to download and provision Jenkins.
     If you receive the following
     ```
     curl: (7) Failed to connect to <ip> port 8080: Connection refused
     ```    
     Then it could be because Jenkins and the sidekicks are still starting up, ipv6 is enabled (try curl with --ipv4), blocking firewall rules, it might be worth stopping and starting Jenkins from Rancher UI.
-    If Jenkins still does not work then check the docker logs (you can do this with the Rancher UI) or run native Docker ps and Docker inspect commands on the agent machine.
+    If Jenkins still does not work then check the docker logs (you can do this with the Rancher UI) or run native Docker ps, Docker inspect and Docker log commands on the agent machine. The log file may for the Jenkins primary may end with something similar to
+    ```
+    --> setting agent port for jnlp
+    --> setting agent port for jnlp... done
+    Jul 07, 2017 11:22:45 AM hudson.model.UpdateSite updateData
+    INFO: Obtained the latest update center data file for UpdateSource default
+    Jul 07, 2017 11:22:46 AM hudson.model.DownloadService$Downloadable load
+    INFO: Obtained the updated data file for hudson.tasks.Maven.MavenInstaller
+    Jul 07, 2017 11:22:47 AM hudson.model.UpdateSite updateData
+    INFO: Obtained the latest update center data file for UpdateSource default
+    Jul 07, 2017 11:22:47 AM hudson.WebAppMain$3 run
+    INFO: Jenkins is fully up and running
+    Jul 07, 2017 11:24:59 AM hudson.model.DownloadService$Downloadable load
+    INFO: Obtained the updated data file for hudson.tools.JDKInstaller
+    Jul 07, 2017 11:24:59 AM hudson.model.AsyncPeriodicWork$1 run
+    INFO: Finished Download metadata. 270,664 ms
+    ```
 
 8. Ensure the Jenkins container is running correctly
     On the host in the browser with Rancher select Infrastructure, then hosts, then view the Jenkins container stats
