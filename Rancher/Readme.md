@@ -39,7 +39,7 @@ The Vagrant file contains definitions for two virtual machines, a Rancher server
    Back to your browser on the host machine, in rancher, click on Infrastructure, then Add Host
    Select "Something Else" and enter use the IP address of your Rancher server http://172.19.8.100:9000
    Click next
-   Set the agent host to 172.19.8.101 (step 4)and click on the clipboard icon (step 5 in the UI)
+   Set the agent host to 172.19.8.101 (step 4) and click on the clipboard icon (step 5 in the UI)
    Your clipboard should contain something similar to the text below
    sudo docker run -e CATTLE_AGENT_IP="172.19.8.101"  --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:v1.2.2 http://172.19.8.100:9000/v1/scripts/9AB60D6BDAA0171D34DE:1483142400000:7Xf5xcrunyHoGNkhFaXYv6yFag
 
@@ -54,10 +54,10 @@ The Vagrant file contains definitions for two virtual machines, a Rancher server
     In the browser on the host go to Rancher server, Catalog, select Jenkins, select port number 8080
 
 7. Test Jenkins
-   When Jenkins has provisioned test it inside the Rancher agent machine
+   When Jenkins has provisioned test it on your host in a browser or with curl
     ```
     sudo su -
-    curl http://localhost:8080
+    curl http://172.19.8.101:8080
     ```
     NB: It may take some time to provision Jenkins depending on your download speed, the processing power of your host and the settings on the VM
     If you receive the following
@@ -70,7 +70,7 @@ The Vagrant file contains definitions for two virtual machines, a Rancher server
 8. Ensure the Jenkins container is running correctly
     On the host in the browser with Rancher select Infrastructure, then hosts, then view the Jenkins container stats
 
-9. Test Jenkins
+9. Access Jenkins via the browser
     On the host open another browser tab, enter http://localhost:8080, this will load the Jenkins start page
  
 Notes:
