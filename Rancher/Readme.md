@@ -54,16 +54,33 @@ The Vagrant file contains definitions for two virtual machines, a Rancher server
     In the browser on the host go to Rancher server, Catalog, select Jenkins, select port number 8080
 
 7. Test Jenkins
-   When Jenkins has provisioned test it on your host in a browser or with curl
+   When Jenkins has provisioned test it on your guest VM with curl
     ```
     sudo su -
     curl http://172.19.8.101:8080
     ```
+    or
+    ```
+    sudo curl http://172.19.8.101:8080
+    ```
+    The response will be similar to the one below
+    ```
+    <html><head><meta http-equiv='refresh' content='1;url=/login?from=%2F'/><script>window.location.replace('/login?from=%2F');</script></head><body style='background-color:white; color:white;'>
+
+
+    Authentication required
+    <!--
+    You are authenticated as: anonymous
+    Groups that you are in:
+
+    Permission you need to have (but didn't): hudson.model.Hudson.Administer
+    -->
+    ```
     NB: It may take some time to provision Jenkins depending on your download speed, the processing power of your host and the settings on the VM
     If you receive the following
     ```
-    curl: (7) Failed to connect to localhost port 8080: Connection refused
-    ```
+    curl: (7) Failed to connect to <ip> port 8080: Connection refused
+    ```    
     Then it could be because Jenkins and the sidekicks are still starting up, ipv6 is enabled (try curl with --ipv4), blocking firewall rules, it might be worth stopping and starting Jenkins from Rancher UI.
     If Jenkins still does not work then check the docker logs (you can do this with the Rancher UI) or run native Docker ps and Docker inspect commands on the agent machine.
 
@@ -71,7 +88,7 @@ The Vagrant file contains definitions for two virtual machines, a Rancher server
     On the host in the browser with Rancher select Infrastructure, then hosts, then view the Jenkins container stats
 
 9. Access Jenkins via the browser
-    On the host open another browser tab, enter http://localhost:8080, this will load the Jenkins start page
+    On the host open another browser tab, enter  http://172.19.8.101:8080, this will load the Jenkins start page
  
 Notes:
 You can access the Rancher server UI with http://127.0.0.1:9000
